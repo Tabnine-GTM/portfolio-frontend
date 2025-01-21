@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axios from "axios";
+import { API_BASE_URL } from "@/config";
 
 interface LoginProps {
   setIsAuthenticated: (value: boolean) => void;
@@ -22,7 +23,7 @@ export default function Login({ setIsAuthenticated }: LoginProps) {
       formData.append("password", password);
 
       const response = await axios.post(
-        "http://localhost:8000/auth/login",
+        `${API_BASE_URL}/auth/login`,
         formData,
         {
           headers: {
