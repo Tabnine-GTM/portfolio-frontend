@@ -1,50 +1,87 @@
-# React + TypeScript + Vite
+# Portfolio Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend application for the Portfolio project, built with React, TypeScript, and Vite.
 
-Currently, two official plugins are available:
+## Prerequisites
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Before you begin, ensure you have the following installed on your system:
 
-## Expanding the ESLint configuration
+- Node.js (v14.0.0 or later)
+- npm (v6.0.0 or later)
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Getting Started
 
-- Configure the top-level `parserOptions` property like this:
+Follow these steps to set up your development environment:
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+1. Clone the repository:
+
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+git clone https://github.com/your-username/portfolio-frontend.git
+cd portfolio-frontend
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
 ```
+
+2. Install dependencies:
+
+```
+
+npm install
+
+```
+
+3. Set up environment variables:
+
+```
+
+cp .env.sample .env
+
+```
+
+Open the `.env` file and update the values as needed for your local setup.
+
+## Running the Application
+
+To start the development server:
+
+```
+
+npm run dev
+
+```
+
+This will start the application on `http://localhost:5173` (or another port if 5173 is already in use).
+
+## Building for Production
+
+To create a production build:
+
+```
+
+npm run build
+
+```
+
+This will generate a `dist` folder with the compiled assets.
+
+## Other Available Scripts
+
+- `npm run lint`: Run ESLint to check for code quality and style issues
+- `npm run preview`: Preview the production build locally
+
+## Project Structure
+
+- `src/`: Contains the source code
+  - `components/`: Reusable React components
+  - `pages/`: Individual page components
+  - `assets/`: Static assets like images and icons
+  - `lib/`: Utility functions and helpers
+- `public/`: Public assets that are copied to the build folder
+
+## Contributing
+
+Please read our [Contributing Guide](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
