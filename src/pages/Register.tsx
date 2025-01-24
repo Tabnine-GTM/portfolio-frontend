@@ -3,22 +3,19 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import axios from "axios";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Register() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:8000/auth/register", {
-        username,
-        email,
-        password
-      });
+      await register.mutateAsync({ username, email, password });
       navigate("/login");
     } catch (error) {
       console.error("Registration failed:", error);
@@ -58,7 +55,9 @@ export default function Register() {
             required
           />
         </div>
-        <Button type="submit">Register</Button>
+        <Button type="submit" disabled={register.isPending}>
+          {register.isPending ? "Registering..." : "Register"}
+        </Button>
       </form>
     </div>
   );

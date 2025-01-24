@@ -1,20 +1,13 @@
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
-interface LayoutProps {
-  isAuthenticated: boolean;
-  setIsAuthenticated: (value: boolean) => void;
-}
-
-export default function Layout({
-  isAuthenticated,
-  setIsAuthenticated
-}: LayoutProps) {
+export default function Layout() {
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    setIsAuthenticated(false);
+    logout();
     navigate("/");
   };
   return (
@@ -25,12 +18,17 @@ export default function Layout({
             Stock Portfolio
           </Link>
           <div className="space-x-4">
-            {isAuthenticated ? (
+            {user.data ? (
               <>
                 <Link to="/portfolio" className="hover:underline">
                   Portfolio
                 </Link>
-                <Button onClick={handleLogout}>Logout</Button>
+                <span className="text-sm">
+                  Welcome, {user.data?.data.username}
+                </span>
+                <Button variant="secondary" onClick={handleLogout}>
+                  Logout
+                </Button>
               </>
             ) : (
               <>

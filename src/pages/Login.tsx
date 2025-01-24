@@ -1,38 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import axios from "axios";
-import { API_BASE_URL } from "@/config";
+import { useAuth } from "@/hooks/useAuth";
 
-interface LoginProps {
-  setIsAuthenticated: (value: boolean) => void;
-}
-
-export default function Login({ setIsAuthenticated }: LoginProps) {
+export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { login, token } = useAuth();
+
+  useEffect(() => {
+    if (token) {
+      navigate("/portfolio");
+    }
+  }, [token, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const formData = new FormData();
-      formData.append("username", username);
-      formData.append("password", password);
-
-      const response = await axios.post(
-        `${API_BASE_URL}/auth/login`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data"
-          }
-        }
-      );
-      localStorage.setItem("token", response.data.access_token);
-      setIsAuthenticated(true);
+      await login.mutateAsync({ username, password });
       navigate("/portfolio");
     } catch (error) {
       console.error("Login failed:", error);
@@ -62,7 +50,9 @@ export default function Login({ setIsAuthenticated }: LoginProps) {
             required
           />
         </div>
-        <Button type="submit">Login</Button>
+        <Button type="submit" disabled={login.isPending}>
+          {login.isPending ? "Logging in..." : "Login"}
+        </Button>
       </form>
     </div>
   );

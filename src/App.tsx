@@ -11,59 +11,52 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Portfolio from "./pages/Portfolio";
 import AddStock from "./pages/AddStock";
-import { useState } from "react";
+import { useAuth } from "./hooks/useAuth";
 
 const queryClient = new QueryClient();
 
-function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    !!localStorage.getItem("token")
-  );
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { token } = useAuth();
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
 
-  const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-    if (!isAuthenticated) {
-      return <Navigate to="/login" replace />;
-    }
-    return children;
-  };
+function AppRoutes() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+          <Route
+            path="portfolio"
+            element={
+              <ProtectedRoute>
+                <Portfolio />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="add-stock"
+            element={
+              <ProtectedRoute>
+                <AddStock />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
+      </Routes>
+    </Router>
+  );
+}
+
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <Layout
-                isAuthenticated={isAuthenticated}
-                setIsAuthenticated={setIsAuthenticated}
-              />
-            }
-          >
-            <Route index element={<Home />} />
-            <Route
-              path="login"
-              element={<Login setIsAuthenticated={setIsAuthenticated} />}
-            />
-            <Route path="register" element={<Register />} />
-            <Route
-              path="portfolio"
-              element={
-                <ProtectedRoute>
-                  <Portfolio />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="add-stock"
-              element={
-                <ProtectedRoute>
-                  <AddStock />
-                </ProtectedRoute>
-              }
-            />
-          </Route>
-        </Routes>
-      </Router>
+      <AppRoutes />
     </QueryClientProvider>
   );
 }

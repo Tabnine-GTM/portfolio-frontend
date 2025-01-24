@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axios from "axios";
+import { useAuth } from "@/hooks/useAuth";
+import { API_BASE_URL } from "@/config";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function AddStock() {
   const [ticker_symbol, setTickerSymbol] = useState("");
@@ -12,27 +15,38 @@ export default function AddStock() {
   const [number_of_shares, setNumberOfShares] = useState("");
   const [purchase_price, setPurchasePrice] = useState("");
   const navigate = useNavigate();
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+
+  const addStockMutation = useMutation({
+    mutationFn: (stockData: {
+      ticker_symbol: string;
+      name: string;
+      issue_date: string;
+      number_of_shares: number;
+      purchase_price: number;
+    }) =>
+      axios.post(`${API_BASE_URL}/portfolio/stock`, stockData, {
+        headers: { Authorization: `Bearer ${token}` }
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["portfolio"] });
+      navigate("/portfolio");
+    },
+    onError: (error) => {
+      console.error("Failed to add stock:", error);
+    }
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await axios.post(
-        "http://localhost:8000/portfolio/stock",
-        {
-          ticker_symbol,
-          name,
-          issue_date,
-          number_of_shares: Number(number_of_shares),
-          purchase_price: Number(purchase_price)
-        },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-        }
-      );
-      navigate("/portfolio");
-    } catch (error) {
-      console.error("Failed to add stock:", error);
-    }
+    addStockMutation.mutate({
+      ticker_symbol,
+      name,
+      issue_date,
+      number_of_shares: Number(number_of_shares),
+      purchase_price: Number(purchase_price)
+    });
   };
 
   return (
@@ -63,6 +77,7 @@ export default function AddStock() {
             type="date"
             value={issue_date}
             onChange={(e) => setIssueDate(e.target.value)}
+            required
           />
         </div>
         <div>
@@ -86,7 +101,9 @@ export default function AddStock() {
             required
           />
         </div>
-        <Button type="submit">Add Stock</Button>
+        <Button type="submit" disabled={addStockMutation.isPending}>
+          {addStockMutation.isPending ? "Adding..." : "Add Stock"}
+        </Button>
       </form>
     </div>
   );
