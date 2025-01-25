@@ -10,7 +10,6 @@ import {
   TableRow
 } from "@/components/ui/table";
 import axios from "axios";
-import { useAuth } from "@/hooks/useAuth";
 import { API_BASE_URL } from "@/config";
 
 interface Stock {
@@ -23,7 +22,6 @@ interface Stock {
 }
 
 export default function Portfolio() {
-  const { token } = useAuth();
   const {
     data: portfolio,
     isLoading,
@@ -32,11 +30,10 @@ export default function Portfolio() {
     queryKey: ["portfolio"],
     queryFn: async () => {
       const response = await axios.get(`${API_BASE_URL}/portfolio`, {
-        headers: { Authorization: `Bearer ${token}` }
+        withCredentials: true
       });
       return response.data;
-    },
-    enabled: !!token
+    }
   });
 
   if (isLoading) return <div>Loading...</div>;

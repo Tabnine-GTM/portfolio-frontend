@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axios from "axios";
-import { useAuth } from "@/hooks/useAuth";
 import { API_BASE_URL } from "@/config";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -15,7 +14,6 @@ export default function AddStock() {
   const [number_of_shares, setNumberOfShares] = useState("");
   const [purchase_price, setPurchasePrice] = useState("");
   const navigate = useNavigate();
-  const { token } = useAuth();
   const queryClient = useQueryClient();
 
   const addStockMutation = useMutation({
@@ -27,7 +25,7 @@ export default function AddStock() {
       purchase_price: number;
     }) =>
       axios.post(`${API_BASE_URL}/portfolio/stock`, stockData, {
-        headers: { Authorization: `Bearer ${token}` }
+        withCredentials: true
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["portfolio"] });

@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export default function Register() {
   const [username, setUsername] = useState("");
@@ -14,17 +16,26 @@ export default function Register() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await register.mutateAsync({ username, email, password });
+    await register.mutateAsync({ username, email, password });
+    if (!register.isError) {
       navigate("/login");
-    } catch (error) {
-      console.error("Registration failed:", error);
     }
   };
 
   return (
     <div className="max-w-md mx-auto">
       <h1 className="text-2xl font-bold mb-4">Register</h1>
+      {register.isError && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            {register.error instanceof Error
+              ? register.error.message
+              : "An error occurred during registration."}
+          </AlertDescription>
+        </Alert>
+      )}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <Label htmlFor="username">Username</Label>

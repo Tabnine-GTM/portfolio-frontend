@@ -4,32 +4,40 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const { login, token } = useAuth();
+  const { login, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    if (token) {
+    if (isAuthenticated) {
       navigate("/portfolio");
     }
-  }, [token, navigate]);
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await login.mutateAsync({ username, password });
-      navigate("/portfolio");
-    } catch (error) {
-      console.error("Login failed:", error);
-    }
+    await login.mutateAsync({ username, password });
   };
 
   return (
     <div className="max-w-md mx-auto">
       <h1 className="text-2xl font-bold mb-4">Login</h1>
+      {login.isError && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            {login.error instanceof Error
+              ? login.error.message
+              : "An error occurred during login."}
+          </AlertDescription>
+        </Alert>
+      )}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <Label htmlFor="username">Username</Label>

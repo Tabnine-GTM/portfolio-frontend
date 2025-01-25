@@ -16,8 +16,8 @@ import { useAuth } from "./hooks/useAuth";
 const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { token } = useAuth();
-  if (!token) {
+  const { isAuthenticated } = useAuth();
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
   return children;

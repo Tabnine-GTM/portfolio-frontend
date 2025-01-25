@@ -3,11 +3,11 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Layout() {
-  const { logout, user } = useAuth();
+  const { logout, user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    logout.mutateAsync();
     navigate("/");
   };
   return (
@@ -18,7 +18,7 @@ export default function Layout() {
             Stock Portfolio
           </Link>
           <div className="space-x-4">
-            {user.data ? (
+            {isAuthenticated ? (
               <>
                 <Link to="/portfolio" className="hover:underline">
                   Portfolio
@@ -27,7 +27,7 @@ export default function Layout() {
                   Welcome, {user.data?.data.username}
                 </span>
                 <Button variant="secondary" onClick={handleLogout}>
-                  Logout
+                  {logout.isPending ? "Logging out..." : "Logout"}
                 </Button>
               </>
             ) : (

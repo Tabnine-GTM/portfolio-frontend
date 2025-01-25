@@ -1,32 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { API_BASE_URL } from "@/config";
 import axios from "axios";
-import { useEffect } from "react";
-
-const AUTH_TOKEN_KEY = "authToken";
 
 export function useAuth() {
   const queryClient = useQueryClient();
-
-  const getToken = () =>
-    queryClient.getQueryData<string>([AUTH_TOKEN_KEY]) || null;
-
-  const setToken = (newToken: string | null) => {
-    queryClient.setQueryData([AUTH_TOKEN_KEY], newToken);
-    if (newToken) {
-      sessionStorage.setItem("token", newToken);
-    } else {
-      sessionStorage.removeItem("token");
-    }
-  };
-
-  // Token initialization
-  useEffect(() => {
-    const storedToken = sessionStorage.getItem("token");
-    if (storedToken && !getToken()) {
-      setToken(storedToken);
-    }
-  });
 
   const login = useMutation({
     mutationFn: (credentials: { username: string; password: string }) => {
@@ -38,27 +15,30 @@ export function useAuth() {
         withCredentials: true
       });
     },
-    onSuccess: (data) => {
-      const newToken = data.data.access_token;
-      setToken(newToken);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
     }
   });
 
-  const logout = () => {
-    setToken(null);
-    queryClient.setQueryData(["user"], null);
-  };
+  const logout = useMutation({
+    mutationFn: () =>
+      axios.post(`${API_BASE_URL}/auth/logout`, {}, { withCredentials: true }),
+    onSuccess: () => {
+      queryClient.setQueryData(["user"], null);
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+    }
+  });
 
   const register = useMutation({
     mutationFn: (userData: {
       username: string;
       email: string;
       password: string;
-    }) => axios.post(`${API_BASE_URL}/auth/register`, userData),
-    onSuccess: (data) => {
-      const newToken = data.data.access_token;
-      setToken(newToken);
+    }) =>
+      axios.post(`${API_BASE_URL}/auth/register`, userData, {
+        withCredentials: true
+      }),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
     }
   });
@@ -66,11 +46,15 @@ export function useAuth() {
   const user = useQuery({
     queryKey: ["user"],
     queryFn: () =>
-      axios.get(`${API_BASE_URL}/auth/user`, {
-        headers: { Authorization: `Bearer ${getToken()}` }
-      }),
-    enabled: !!getToken()
+      axios.get(`${API_BASE_URL}/auth/user`, { withCredentials: true }),
+    retry: false
   });
 
-  return { token: getToken(), login, logout, register, user };
+  return {
+    isAuthenticated: user.isSuccess && user.data?.data != null,
+    login,
+    logout,
+    register,
+    user
+  };
 }
