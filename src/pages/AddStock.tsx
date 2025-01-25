@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,11 +7,6 @@ import { API_BASE_URL } from "@/config";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function AddStock() {
-  const [ticker_symbol, setTickerSymbol] = useState("");
-  const [name, setName] = useState("");
-  const [issue_date, setIssueDate] = useState("");
-  const [number_of_shares, setNumberOfShares] = useState("");
-  const [purchase_price, setPurchasePrice] = useState("");
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -36,14 +30,15 @@ export default function AddStock() {
     }
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const formData = new FormData(e.currentTarget);
     addStockMutation.mutate({
-      ticker_symbol,
-      name,
-      issue_date,
-      number_of_shares: Number(number_of_shares),
-      purchase_price: Number(purchase_price)
+      ticker_symbol: formData.get("ticker_symbol") as string,
+      name: formData.get("name") as string,
+      issue_date: formData.get("issue_date") as string,
+      number_of_shares: Number(formData.get("number_of_shares")),
+      purchase_price: Number(formData.get("purchase_price"))
     });
   };
 
@@ -53,38 +48,22 @@ export default function AddStock() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <Label htmlFor="ticker_symbol">Ticker Symbol</Label>
-          <Input
-            id="ticker_symbol"
-            value={ticker_symbol}
-            onChange={(e) => setTickerSymbol(e.target.value)}
-            required
-          />
+          <Input id="ticker_symbol" name="ticker_symbol" required />
         </div>
         <div>
           <Label htmlFor="name">Name</Label>
-          <Input
-            id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
+          <Input id="name" name="name" />
         </div>
         <div>
           <Label htmlFor="issue_date">Issue Date</Label>
-          <Input
-            id="issue_date"
-            type="date"
-            value={issue_date}
-            onChange={(e) => setIssueDate(e.target.value)}
-            required
-          />
+          <Input id="issue_date" name="issue_date" type="date" required />
         </div>
         <div>
           <Label htmlFor="number_of_shares">Number of Shares</Label>
           <Input
             id="number_of_shares"
+            name="number_of_shares"
             type="number"
-            value={number_of_shares}
-            onChange={(e) => setNumberOfShares(e.target.value)}
             required
           />
         </div>
@@ -92,10 +71,9 @@ export default function AddStock() {
           <Label htmlFor="purchase_price">Purchase Price</Label>
           <Input
             id="purchase_price"
+            name="purchase_price"
             type="number"
             step="0.01"
-            value={purchase_price}
-            onChange={(e) => setPurchasePrice(e.target.value)}
             required
           />
         </div>
