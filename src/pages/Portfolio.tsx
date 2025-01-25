@@ -9,35 +9,20 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-import axios from "axios";
-import { API_BASE_URL } from "@/config";
-
-interface Stock {
-  id: number;
-  ticker_symbol: string;
-  name: string;
-  issue_date: string;
-  number_of_shares: number;
-  purchase_price: number;
-}
-
+import { portfolioApi } from "@/lib/portfolioApi";
+import { Stock, type Portfolio } from "@/types/portfolio";
 export default function Portfolio() {
   const {
     data: portfolio,
     isLoading,
     error
-  } = useQuery({
+  } = useQuery<Portfolio, Error>({
     queryKey: ["portfolio"],
-    queryFn: async () => {
-      const response = await axios.get(`${API_BASE_URL}/portfolio`, {
-        withCredentials: true
-      });
-      return response.data;
-    }
+    queryFn: () => portfolioApi.getPortfolio().then((response) => response.data)
   });
 
   if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>An error occurred: {(error as Error).message}</div>;
+  if (error) return <div>An error occurred: {error.message}</div>;
 
   return (
     <div>
@@ -56,7 +41,7 @@ export default function Portfolio() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {portfolio.stocks.map((stock: Stock) => (
+          {portfolio?.stocks.map((stock: Stock) => (
             <TableRow key={stock.id}>
               <TableCell>{stock.ticker_symbol}</TableCell>
               <TableCell>{stock.name}</TableCell>

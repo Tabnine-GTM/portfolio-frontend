@@ -1,18 +1,27 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { API_BASE_URL } from "@/config";
-import axios from "axios";
+import api from "@/lib/api";
+
+interface Credentials {
+  username: string;
+  password: string;
+}
+
+interface UserData {
+  username: string;
+  email: string;
+  password: string;
+}
 
 export function useAuth() {
   const queryClient = useQueryClient();
 
   const login = useMutation({
-    mutationFn: (credentials: { username: string; password: string }) => {
+    mutationFn: (credentials: Credentials) => {
       const formData = new FormData();
       formData.append("username", credentials.username);
       formData.append("password", credentials.password);
-      return axios.post(`${API_BASE_URL}/auth/login`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-        withCredentials: true
+      return api.post(`/auth/login`, formData, {
+        headers: { "Content-Type": "multipart/form-data" }
       });
     },
     onSuccess: () => {
@@ -21,8 +30,7 @@ export function useAuth() {
   });
 
   const logout = useMutation({
-    mutationFn: () =>
-      axios.post(`${API_BASE_URL}/auth/logout`, {}, { withCredentials: true }),
+    mutationFn: () => api.post(`/auth/logout`, {}),
     onSuccess: () => {
       queryClient.setQueryData(["user"], null);
       queryClient.invalidateQueries({ queryKey: ["user"] });
@@ -30,14 +38,7 @@ export function useAuth() {
   });
 
   const register = useMutation({
-    mutationFn: (userData: {
-      username: string;
-      email: string;
-      password: string;
-    }) =>
-      axios.post(`${API_BASE_URL}/auth/register`, userData, {
-        withCredentials: true
-      }),
+    mutationFn: (userData: UserData) => api.post(`/auth/register`, userData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
     }
@@ -45,8 +46,7 @@ export function useAuth() {
 
   const user = useQuery({
     queryKey: ["user"],
-    queryFn: () =>
-      axios.get(`${API_BASE_URL}/auth/user`, { withCredentials: true }),
+    queryFn: () => api.get(`/auth/user`),
     retry: false
   });
 

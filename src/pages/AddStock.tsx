@@ -2,25 +2,17 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import axios from "axios";
-import { API_BASE_URL } from "@/config";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { portfolioApi } from "@/lib/portfolioApi";
+import { Stock } from "@/types/portfolio";
 
 export default function AddStock() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const addStockMutation = useMutation({
-    mutationFn: (stockData: {
-      ticker_symbol: string;
-      name: string;
-      issue_date: string;
-      number_of_shares: number;
-      purchase_price: number;
-    }) =>
-      axios.post(`${API_BASE_URL}/portfolio/stock`, stockData, {
-        withCredentials: true
-      }),
+    mutationFn: (stockData: Omit<Stock, "id">) =>
+      portfolioApi.addStock(stockData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["portfolio"] });
       navigate("/portfolio");
