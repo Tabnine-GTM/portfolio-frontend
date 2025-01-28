@@ -25,6 +25,7 @@ export function useAuth() {
 			});
 		},
 		onSuccess: () => {
+			queryClient.setQueryData(["authStatus"], "authenticated");
 			queryClient.invalidateQueries({ queryKey: ["user"] });
 		},
 	});
@@ -32,8 +33,8 @@ export function useAuth() {
 	const logout = useMutation({
 		mutationFn: () => api.post(`/auth/logout`, {}),
 		onSuccess: () => {
+			queryClient.setQueryData(["authStatus"], "unauthenticated");
 			queryClient.setQueryData(["user"], null);
-			queryClient.invalidateQueries({ queryKey: ["user"] });
 		},
 	});
 
@@ -44,14 +45,24 @@ export function useAuth() {
 		},
 	});
 
+	const authStatus = useQuery({
+		queryKey: ["authStatus"],
+		queryFn: () => "unauthenticated",
+		staleTime: Infinity,
+	});
+
 	const user = useQuery({
 		queryKey: ["user"],
 		queryFn: () => api.get(`/auth/user`),
 		retry: false,
+		enabled: authStatus.data === "authenticated",
 	});
 
 	return {
-		isAuthenticated: user.isSuccess && user.data?.data != null,
+		isAuthenticated:
+			authStatus.data === "authenticated" &&
+			user.isSuccess &&
+			user.data?.data != null,
 		login,
 		logout,
 		register,
