@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 
 export default function Layout() {
 	const { logout, user, isAuthenticated } = useAuth();
@@ -10,6 +10,10 @@ export default function Layout() {
 		logout.mutateAsync();
 		navigate("/");
 	};
+
+	const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
+		`hover:underline ${isActive ? "font-bold" : ""}`;
+
 	return (
 		<div className="min-h-screen bg-background">
 			<header className="bg-primary text-primary-foreground p-4">
@@ -20,9 +24,9 @@ export default function Layout() {
 					<div className="space-x-4">
 						{isAuthenticated ? (
 							<>
-								<Link to="/portfolio" className="hover:underline">
+								<NavLink to="/portfolio" className={navLinkClasses}>
 									Portfolio
-								</Link>
+								</NavLink>
 								<span className="text-sm">
 									Welcome, {user.data?.data.username}
 								</span>
@@ -32,9 +36,9 @@ export default function Layout() {
 							</>
 						) : (
 							<>
-								<Link to="/login" className="hover:underline">
+								<NavLink to="/login" className={navLinkClasses}>
 									Login
-								</Link>
+								</NavLink>
 							</>
 						)}
 					</div>
