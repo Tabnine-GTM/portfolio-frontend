@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { AlertCircle } from "lucide-react";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Login() {
 	const navigate = useNavigate();
@@ -52,6 +52,12 @@ export default function Login() {
 					{login.isPending ? "Logging in..." : "Login"}
 				</Button>
 			</form>
+			<p className="mt-4 text-center">
+				Don't have an account?{" "}
+				<Link to="/register" className="text-blue-600 hover:underline">
+					Register here
+				</Link>
+			</p>
 		</div>
 	);
 }

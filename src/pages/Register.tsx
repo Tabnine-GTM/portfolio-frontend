@@ -4,11 +4,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { AlertCircle } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Register() {
 	const navigate = useNavigate();
-	const { register } = useAuth();
+	const { register, isAuthenticated } = useAuth();
+
+	useEffect(() => {
+		if (isAuthenticated) {
+			navigate("/portfolio");
+		}
+	}, [isAuthenticated, navigate]);
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -53,6 +60,12 @@ export default function Register() {
 					{register.isPending ? "Registering..." : "Register"}
 				</Button>
 			</form>
+			<p className="mt-4 text-center">
+				Already have an account?{" "}
+				<Link to="/login" className="text-blue-600 hover:underline">
+					Login here
+				</Link>
+			</p>
 		</div>
 	);
 }
