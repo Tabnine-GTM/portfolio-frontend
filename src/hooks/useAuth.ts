@@ -45,9 +45,28 @@ export function useAuth() {
 		},
 	});
 
+	const refreshToken = useMutation({
+		mutationFn: () => api.post(`/auth/refresh`, {}),
+		onSuccess: () => {
+			queryClient.setQueryData(["authStatus"], "authenticated");
+			queryClient.invalidateQueries({ queryKey: ["user"] });
+		},
+		onError: () => {
+			queryClient.setQueryData(["authStatus"], "unauthenticated");
+			queryClient.setQueryData(["user"], null);
+		},
+	});
+
 	const authStatus = useQuery({
 		queryKey: ["authStatus"],
-		queryFn: () => "unauthenticated",
+		queryFn: async () => {
+			try {
+				await api.get("/auth/user");
+				return "authenticated";
+			} catch (error) {
+				return "unauthenticated";
+			}
+		},
 		staleTime: Infinity,
 	});
 
@@ -66,6 +85,7 @@ export function useAuth() {
 		login,
 		logout,
 		register,
+		refreshToken,
 		user,
 	};
 }
