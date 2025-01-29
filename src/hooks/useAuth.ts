@@ -17,12 +17,7 @@ export function useAuth() {
 
 	const login = useMutation({
 		mutationFn: (credentials: Credentials) => {
-			const formData = new FormData();
-			formData.append("username", credentials.username);
-			formData.append("password", credentials.password);
-			return api.post(`/auth/login`, formData, {
-				headers: { "Content-Type": "multipart/form-data" },
-			});
+			return api.post(`/auth/login`, credentials);
 		},
 		onSuccess: () => {
 			queryClient.setQueryData(["authStatus"], "authenticated");
