@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Portfolio from "./pages/Portfolio";
 import Register from "./pages/Register";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ function AppRoutes() {
 						}
 					/>
 				</Route>
+				<Route path="*" element={<NotFound />} />
 			</Routes>
 		</Router>
 	);
