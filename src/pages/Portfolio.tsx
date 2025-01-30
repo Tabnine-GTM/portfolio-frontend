@@ -10,7 +10,7 @@ import {
 import { portfolioApi } from "@/lib/portfolioApi";
 import { type Portfolio, Stock } from "@/types/portfolio";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 export default function Portfolio() {
 	const {
 		data: portfolio,

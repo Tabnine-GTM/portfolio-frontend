@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { portfolioApi } from "@/lib/portfolioApi";
 import { Stock } from "@/types/portfolio";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 export default function AddStock() {
 	const navigate = useNavigate();

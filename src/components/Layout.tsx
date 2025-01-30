@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate } from "react-router";
 
 export default function Layout() {
 	const { logout, user, isAuthenticated } = useAuth();

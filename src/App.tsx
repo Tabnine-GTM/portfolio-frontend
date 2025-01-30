@@ -1,10 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-	Navigate,
-	Route,
-	BrowserRouter as Router,
-	Routes,
-} from "react-router-dom";
+import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router";
 import Layout from "./components/Layout";
 import { useAuth } from "./hooks/useAuth";
 import AddStock from "./pages/AddStock";
