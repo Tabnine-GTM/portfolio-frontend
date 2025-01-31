@@ -1,47 +1,36 @@
-import api from "@/lib/api";
+import { authApi } from "@/lib/authApi";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-interface Credentials {
-	username: string;
-	password: string;
-}
-
-interface UserData {
-	username: string;
-	email: string;
-	password: string;
-}
+import { Credentials, UserData } from "@/types/auth";
 
 export function useAuth() {
 	const queryClient = useQueryClient();
 
-	const login = useMutation({
-		mutationFn: (credentials: Credentials) => {
-			return api.post(`/auth/login`, credentials);
-		},
+	const loginMutation = useMutation({
+		mutationFn: (credentials: Credentials) => authApi.login(credentials),
 		onSuccess: () => {
 			queryClient.setQueryData(["authStatus"], "authenticated");
 			queryClient.invalidateQueries({ queryKey: ["user"] });
 		},
 	});
 
-	const logout = useMutation({
-		mutationFn: () => api.post(`/auth/logout`, {}),
+	const logoutMutation = useMutation({
+		mutationFn: authApi.logout,
 		onSuccess: () => {
 			queryClient.setQueryData(["authStatus"], "unauthenticated");
 			queryClient.setQueryData(["user"], null);
 		},
 	});
 
-	const register = useMutation({
-		mutationFn: (userData: UserData) => api.post(`/auth/register`, userData),
+	const registerMutation = useMutation({
+		mutationFn: (userData: UserData) => authApi.register(userData),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["user"] });
 		},
 	});
 
-	const refreshToken = useMutation({
-		mutationFn: () => api.post(`/auth/refresh`, {}),
+	const refreshTokenMutation = useMutation({
+		mutationFn: authApi.refreshToken,
 		onSuccess: () => {
 			queryClient.setQueryData(["authStatus"], "authenticated");
 			queryClient.invalidateQueries({ queryKey: ["user"] });
@@ -56,9 +45,13 @@ export function useAuth() {
 		queryKey: ["authStatus"],
 		queryFn: async () => {
 			try {
-				await api.get("/auth/user");
+				const userData = await authApi.getCurrentUser();
+				// Update the user query data
+				queryClient.setQueryData(["user"], userData);
 				return "authenticated";
 			} catch (error) {
+				// Clear user data if authentication fails
+				queryClient.setQueryData(["user"], null);
 				return "unauthenticated";
 			}
 		},
@@ -67,9 +60,11 @@ export function useAuth() {
 
 	const user = useQuery({
 		queryKey: ["user"],
-		queryFn: () => api.get(`/auth/user`),
+		queryFn: authApi.getCurrentUser,
 		retry: false,
 		enabled: authStatus.data === "authenticated",
+		// We can reduce staleTime since authStatus will manage the initial fetch
+		staleTime: 5 * 60 * 1000, // 5 minutes
 	});
 
 	return {
@@ -77,10 +72,11 @@ export function useAuth() {
 			authStatus.data === "authenticated" &&
 			user.isSuccess &&
 			user.data?.data != null,
-		login,
-		logout,
-		register,
-		refreshToken,
+		authStatus, // Add this line
+		login: loginMutation,
+		logout: logoutMutation,
+		register: registerMutation,
+		refreshToken: refreshTokenMutation,
 		user,
 	};
 }

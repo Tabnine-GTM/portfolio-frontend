@@ -4,18 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { AlertCircle } from "lucide-react";
-import { useEffect } from "react";
-import { useNavigate, Link } from "react-router";
+import { Link } from "react-router";
 
 export default function Login() {
-	const navigate = useNavigate();
-	const { login, isAuthenticated } = useAuth();
-
-	useEffect(() => {
-		if (isAuthenticated) {
-			navigate("/portfolio");
-		}
-	}, [isAuthenticated, navigate]);
+	const { login } = useAuth();
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();

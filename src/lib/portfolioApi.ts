@@ -7,3 +7,5 @@ export const portfolioApi = {
 		api.post<Stock>("/portfolio/stock", stockData),
 	// Add other portfolio-related API calls here
 };
+
+export default portfolioApi;

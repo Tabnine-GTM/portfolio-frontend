@@ -4,18 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { AlertCircle } from "lucide-react";
-import { useEffect } from "react";
-import { useNavigate, Link } from "react-router";
+import { Link } from "react-router";
 
 export default function Register() {
-	const navigate = useNavigate();
-	const { register, isAuthenticated } = useAuth();
-
-	useEffect(() => {
-		if (isAuthenticated) {
-			navigate("/portfolio");
-		}
-	}, [isAuthenticated, navigate]);
+	const { register } = useAuth();
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -24,9 +16,6 @@ export default function Register() {
 		const email = formData.get("email") as string;
 		const password = formData.get("password") as string;
 		await register.mutateAsync({ username, email, password });
-		if (!register.isError) {
-			navigate("/login");
-		}
 	};
 
 	return (

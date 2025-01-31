@@ -3,3 +3,9 @@ export const API_BASE_URL =
 
 export const ALPHA_VANTAGE_API_KEY =
 	import.meta.env.VITE_ALPHA_VANTAGE_API_KEY || "";
+
+export const authSettings = {
+	redirectTo: "/portfolio",
+	loginPath: "/login",
+	registerPath: "/register",
+};

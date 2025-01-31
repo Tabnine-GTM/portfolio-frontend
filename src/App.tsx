@@ -1,5 +1,12 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router";
+import {
+	Navigate,
+	Outlet,
+	Route,
+	BrowserRouter as Router,
+	Routes,
+	useLocation,
+} from "react-router";
 import Layout from "./components/Layout";
 import { useAuth } from "./hooks/useAuth";
 import AddStock from "./pages/AddStock";
@@ -8,15 +15,41 @@ import Login from "./pages/Login";
 import Portfolio from "./pages/Portfolio";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
+import { authSettings } from "./config";
 
 const queryClient = new QueryClient();
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+const AuthRoute = ({ children }: { children?: React.ReactNode }) => {
 	const { isAuthenticated } = useAuth();
-	if (!isAuthenticated) {
-		return <Navigate to="/login" replace />;
+	const location = useLocation();
+
+	if (isAuthenticated) {
+		const origin = location.state?.from?.pathname;
+		return <Navigate to={origin || authSettings.redirectTo} replace />;
 	}
-	return children;
+	return children ? children : <Outlet />;
+};
+
+const ProtectedRoute = ({ children }: { children?: React.ReactNode }) => {
+	const location = useLocation();
+	const { isAuthenticated, authStatus } = useAuth();
+
+	if (authStatus.isLoading) {
+		// Show a loading indicator while checking authentication
+		return <div>Loading...</div>;
+	}
+
+	if (authStatus.isError || !isAuthenticated) {
+		return (
+			<Navigate
+				to={authSettings.loginPath}
+				replace
+				state={{ from: location }}
+			/>
+		);
+	}
+
+	return children ? children : <Outlet />;
 };
 
 function AppRoutes() {
@@ -25,24 +58,14 @@ function AppRoutes() {
 			<Routes>
 				<Route path="/" element={<Layout />}>
 					<Route index element={<Home />} />
-					<Route path="login" element={<Login />} />
-					<Route path="register" element={<Register />} />
-					<Route
-						path="portfolio"
-						element={
-							<ProtectedRoute>
-								<Portfolio />
-							</ProtectedRoute>
-						}
-					/>
-					<Route
-						path="add-stock"
-						element={
-							<ProtectedRoute>
-								<AddStock />
-							</ProtectedRoute>
-						}
-					/>
+					<Route element={<AuthRoute />}>
+						<Route path="login" element={<Login />} />
+						<Route path="register" element={<Register />} />
+					</Route>
+					<Route element={<ProtectedRoute />}>
+						<Route path="portfolio" element={<Portfolio />} />
+						<Route path="add-stock" element={<AddStock />} />
+					</Route>
 				</Route>
 				<Route path="*" element={<NotFound />} />
 			</Routes>
