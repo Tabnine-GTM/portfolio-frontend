@@ -27,8 +27,8 @@ api.interceptors.response.use(
 			originalRequest._retry = true;
 			try {
 				// Import refreshToken function here to avoid circular dependency
-				const { refreshToken } = await import("./authApi");
-				await refreshToken();
+				const { authApi } = await import("./authApi");
+				await authApi.refreshToken();
 				return api(originalRequest);
 			} catch (refreshError) {
 				return Promise.reject(refreshError);
