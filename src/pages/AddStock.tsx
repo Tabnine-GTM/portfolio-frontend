@@ -15,7 +15,7 @@ export default function AddStock() {
 			portfolioApi.addStock(stockData),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["portfolio"] });
-			navigate("/portfolio");
+			navigate("/dashboard");
 		},
 		onError: (error) => {
 			console.error("Failed to add stock:", error);

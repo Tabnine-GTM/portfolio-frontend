@@ -24,8 +24,8 @@ export default function Layout() {
 					<div className="space-x-4">
 						{isAuthenticated ? (
 							<>
-								<NavLink to="/portfolio" className={navLinkClasses}>
-									Portfolio
+								<NavLink to="/dashboard" className={navLinkClasses}>
+									Dashboard
 								</NavLink>
 								<span className="text-sm">
 									Welcome, {user.data?.data.username}

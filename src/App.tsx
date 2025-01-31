@@ -12,7 +12,7 @@ import { useAuth } from "./hooks/useAuth";
 import AddStock from "./pages/AddStock";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import Portfolio from "./pages/Portfolio";
+import Dashboard from "./pages/Dashboard";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import { authSettings } from "./config";
@@ -63,7 +63,7 @@ function AppRoutes() {
 						<Route path="register" element={<Register />} />
 					</Route>
 					<Route element={<ProtectedRoute />}>
-						<Route path="portfolio" element={<Portfolio />} />
+						<Route path="dashboard" element={<Dashboard />} />
 						<Route path="add-stock" element={<AddStock />} />
 					</Route>
 				</Route>

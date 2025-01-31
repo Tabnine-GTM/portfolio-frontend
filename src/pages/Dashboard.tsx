@@ -11,7 +11,7 @@ import { portfolioApi } from "@/lib/portfolioApi";
 import { type Portfolio, Stock } from "@/types/portfolio";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
-export default function Portfolio() {
+export default function Dashboard() {
 	const {
 		data: portfolio,
 		isLoading,
