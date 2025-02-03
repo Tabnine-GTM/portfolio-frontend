@@ -6,8 +6,9 @@ This is the frontend application for the Portfolio project, built with React, Ty
 
 Before you begin, ensure you have the following installed on your system:
 
-- Node.js (v14.0.0 or later)
-- npm (v6.0.0 or later)
+**Requirements:**
+- Node.js (v16.0.0 or later recommended)
+- npm (v7.0.0 or later recommended)
 
 ## Getting Started
 
