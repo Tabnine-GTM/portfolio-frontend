@@ -5,16 +5,28 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { AlertCircle } from "lucide-react";
 import { Link } from "react-router";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
+const loginSchema = z.object({
+	username: z.string().min(1, "Username is required"),
+	password: z.string().min(1, "Password is required"),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
 export default function Login() {
 	const { login } = useAuth();
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<LoginFormData>({
+		resolver: zodResolver(loginSchema),
+	});
 
-	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		const formData = new FormData(e.currentTarget);
-		const username = formData.get("username") as string;
-		const password = formData.get("password") as string;
-		await login.mutateAsync({ username, password });
+	const onSubmit = async (data: LoginFormData) => {
+		await login.mutateAsync(data);
 	};
 
 	return (
@@ -31,14 +43,24 @@ export default function Login() {
 					</AlertDescription>
 				</Alert>
 			)}
-			<form onSubmit={handleSubmit} className="space-y-4">
+			<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 				<div>
 					<Label htmlFor="username">Username</Label>
-					<Input id="username" name="username" required />
+					<Input id="username" {...register("username")} />
+					{errors.username && (
+						<p className="text-red-500 text-sm mt-1">
+							{errors.username.message}
+						</p>
+					)}
 				</div>
 				<div>
 					<Label htmlFor="password">Password</Label>
-					<Input id="password" name="password" type="password" required />
+					<Input id="password" type="password" {...register("password")} />
+					{errors.password && (
+						<p className="text-red-500 text-sm mt-1">
+							{errors.password.message}
+						</p>
+					)}
 				</div>
 				<Button type="submit" disabled={login.isPending}>
 					{login.isPending ? "Logging in..." : "Login"}

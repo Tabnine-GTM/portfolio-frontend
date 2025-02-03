@@ -5,48 +5,73 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { AlertCircle } from "lucide-react";
 import { Link } from "react-router";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
+const registerSchema = z.object({
+	username: z.string().min(3, "Username must be at least 3 characters"),
+	email: z.string().email("Invalid email address"),
+	password: z.string().min(8, "Password must be at least 8 characters"),
+});
+
+type RegisterFormData = z.infer<typeof registerSchema>;
 export default function Register() {
-	const { register } = useAuth();
+	const { register: registerAuth } = useAuth();
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<RegisterFormData>({
+		resolver: zodResolver(registerSchema),
+	});
 
-	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		const formData = new FormData(e.currentTarget);
-		const username = formData.get("username") as string;
-		const email = formData.get("email") as string;
-		const password = formData.get("password") as string;
-		await register.mutateAsync({ username, email, password });
+	const onSubmit = async (data: RegisterFormData) => {
+		await registerAuth.mutateAsync(data);
 	};
 
 	return (
 		<div className="max-w-md mx-auto">
 			<h1 className="text-2xl font-bold mb-4">Register</h1>
-			{register.isError && (
+			{registerAuth.isError && (
 				<Alert variant="destructive" className="mb-4">
 					<AlertCircle className="h-4 w-4" />
 					<AlertTitle>Error</AlertTitle>
 					<AlertDescription>
-						{register.error instanceof Error
-							? register.error.message
+						{registerAuth.error instanceof Error
+							? registerAuth.error.message
 							: "An error occurred during registration."}
 					</AlertDescription>
 				</Alert>
 			)}
-			<form onSubmit={handleSubmit} className="space-y-4">
+			<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 				<div>
 					<Label htmlFor="username">Username</Label>
-					<Input id="username" name="username" required />
+					<Input id="username" {...register("username")} />
+					{errors.username && (
+						<p className="text-red-500 text-sm mt-1">
+							{errors.username.message}
+						</p>
+					)}
 				</div>
 				<div>
 					<Label htmlFor="email">Email</Label>
-					<Input id="email" name="email" type="email" required />
+					<Input id="email" type="email" {...register("email")} />
+					{errors.email && (
+						<p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+					)}
 				</div>
 				<div>
 					<Label htmlFor="password">Password</Label>
-					<Input id="password" name="password" type="password" required />
+					<Input id="password" type="password" {...register("password")} />
+					{errors.password && (
+						<p className="text-red-500 text-sm mt-1">
+							{errors.password.message}
+						</p>
+					)}
 				</div>
-				<Button type="submit" disabled={register.isPending}>
-					{register.isPending ? "Registering..." : "Register"}
+				<Button type="submit" disabled={registerAuth.isPending}>
+					{registerAuth.isPending ? "Registering..." : "Register"}
 				</Button>
 			</form>
 			<p className="mt-4 text-center">
